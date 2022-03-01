@@ -1,0 +1,541 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mr_lorry
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema mr_lorry
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `mr_lorry` DEFAULT CHARACTER SET utf8 ;
+USE `mr_lorry` ;
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`lory_socity`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`lory_socity` (
+  `socity_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `socitycol_name` VARCHAR(45) NULL,
+  `user_name` VARCHAR(45) NULL,
+  `password` VARCHAR(200) NULL,
+  `image` LONGTEXT NULL,
+  `contact_no` VARCHAR(10) NULL,
+  `no_of_driver` INT(3) NULL,
+  `location_address` VARCHAR(60) NULL,
+  `total_amount` DOUBLE NULL,
+  `paid_amount` DOUBLE NULL,
+  `payble_amount` DOUBLE NULL,
+  `total_hire` INT(10) NULL,
+  `today_hire` INT(10) NULL,
+  `delete_status` INT(1) NULL,
+  `active_status` INT(1) NULL,
+  `last_updated_time` DATETIME NULL,
+  PRIMARY KEY (`socity_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`driver`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`driver` (
+  `driver_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `driver_name` VARCHAR(50) NULL,
+  `user_name` VARCHAR(45) NULL,
+  `password` VARCHAR(200) NULL,
+  `contact_no` VARCHAR(10) NULL,
+  `nic` VARCHAR(15) NULL,
+  `loson_photo` LONGTEXT NULL,
+  `lison_expire_date` DATE NULL,
+  `lison_no` VARCHAR(12) NULL,
+  `lory_app_registration_date` DATE NULL,
+  `total_hire` INT(10) NULL,
+  `today_hire` INT(10) NULL,
+  `compleated_hire` INT(10) NULL,
+  `rejected_hire` INT(10) NULL,
+  `total_pay_amount` DOUBLE NULL,
+  `total_paid_amount` DOUBLE NULL,
+  `total_payble_amount` DOUBLE NULL,
+  `total_km` DOUBLE NULL,
+  `today_km` DOUBLE NULL,
+  `no_of_pay_km` DOUBLE NULL COMMENT 'pay karanda ona km gana\nex-fixed 300km hamoma gewanna ona salli.',
+  `run_km_to_one_payment` DOUBLE NULL COMMENT 'paymnet ekak karanna danata duwala thiyena km gana',
+  `delete_status` INT(1) NULL,
+  `active_satatus` INT(1) NULL,
+  `online_offline_status` INT(1) NULL,
+  `updated_time` DATETIME NULL,
+  `lory_socity_socity_id` INT(10) ZEROFILL NOT NULL,
+  PRIMARY KEY (`driver_id`, `lory_socity_socity_id`),
+  INDEX `fk_driver_lory_socity1_idx` (`lory_socity_socity_id` ASC) VISIBLE,
+  CONSTRAINT `fk_driver_lory_socity1`
+    FOREIGN KEY (`lory_socity_socity_id`)
+    REFERENCES `mr_lorry`.`lory_socity` (`socity_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`rider`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`rider` (
+  `rider_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NULL,
+  `user_name` VARCHAR(45) NULL,
+  `password` VARCHAR(200) NULL,
+  `image` LONGTEXT NULL,
+  `address` VARCHAR(45) NULL,
+  `mobile_no` VARCHAR(10) NULL,
+  `nic` VARCHAR(15) NULL,
+  `delete_status` INT(1) NULL,
+  `active_status` INT(1) NULL,
+  `last_updated_time` DATETIME NULL,
+  `email` VARCHAR(45) NULL,
+  PRIMARY KEY (`rider_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`hire_details`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`hire_details` (
+  `id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `vehicle_no` VARCHAR(10) NULL,
+  `trip_km` DOUBLE NULL COMMENT 'giyapu dura',
+  `customer_ask_km` VARCHAR(45) NULL,
+  `hire_status` INT(1) NULL COMMENT 'get/cancel',
+  `datetime1` DATETIME NULL COMMENT 'hayar eka giyapu welawa',
+  `driver_driver_id` INT ZEROFILL NOT NULL,
+  `rider_rider_id` INT ZEROFILL NOT NULL,
+  PRIMARY KEY (`id`, `driver_driver_id`, `rider_rider_id`),
+  INDEX `fk_hire_details_driver1_idx` (`driver_driver_id` ASC) VISIBLE,
+  INDEX `fk_hire_details_rider1_idx` (`rider_rider_id` ASC) VISIBLE,
+  CONSTRAINT `fk_hire_details_driver1`
+    FOREIGN KEY (`driver_driver_id`)
+    REFERENCES `mr_lorry`.`driver` (`driver_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_hire_details_rider1`
+    FOREIGN KEY (`rider_rider_id`)
+    REFERENCES `mr_lorry`.`rider` (`rider_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`vehicle_types`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`vehicle_types` (
+  `types_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `type_name` VARCHAR(45) NULL,
+  `delete_status` INT(1) NULL,
+  `active_status` INT(1) NULL,
+  `last_updated_time` DATETIME NULL,
+  PRIMARY KEY (`types_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`vehicle`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`vehicle` (
+  `vehicle_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `make` VARCHAR(45) NULL,
+  `modal` VARCHAR(45) NULL,
+  `vehcle_no` VARCHAR(10) NULL,
+  `engin_cc` VARCHAR(7) NULL,
+  `weight` VARCHAR(10) NULL,
+  `open_close_body` VARCHAR(4) NULL COMMENT 'kuduwak sahithada nadda',
+  `image_of_vehicle_with_customer` LONGTEXT NULL,
+  `current_location` LONGTEXT NULL,
+  `active_status` INT(1) NULL,
+  `delete_status` INT(1) NULL,
+  `last_updated_time` DATETIME NULL,
+  `driver_driver_id` INT ZEROFILL NOT NULL,
+  `vehicle_types_types_id` INT ZEROFILL NOT NULL,
+  PRIMARY KEY (`vehicle_id`, `driver_driver_id`, `vehicle_types_types_id`),
+  INDEX `fk_vehicle_driver1_idx` (`driver_driver_id` ASC) VISIBLE,
+  INDEX `fk_vehicle_vehicle_types1_idx` (`vehicle_types_types_id` ASC) VISIBLE,
+  CONSTRAINT `fk_vehicle_driver1`
+    FOREIGN KEY (`driver_driver_id`)
+    REFERENCES `mr_lorry`.`driver` (`driver_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_vehicle_vehicle_types1`
+    FOREIGN KEY (`vehicle_types_types_id`)
+    REFERENCES `mr_lorry`.`vehicle_types` (`types_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`document_types`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`document_types` (
+  `document_types_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `document_name` VARCHAR(45) NULL,
+  `delete_status` INT(1) NULL,
+  `active_satatus` INT(1) NULL,
+  `last_upated_time` DATETIME NULL,
+  PRIMARY KEY (`document_types_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`dealer_point`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`dealer_point` (
+  `iddealer_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `dealer_name` VARCHAR(45) NULL,
+  `user_name` VARCHAR(45) NULL,
+  `password` VARCHAR(200) NULL,
+  `image` LONGTEXT NULL,
+  `address` VARCHAR(45) NULL,
+  `contact_no` VARCHAR(10) NULL,
+  `nic` VARCHAR(15) NULL,
+  `total_hire` INT(10) NULL,
+  `today_hire` INT(10) NULL,
+  `total_amount` DOUBLE NULL,
+  `paid_amount` DOUBLE NULL,
+  `payble_amount` DOUBLE NULL,
+  `delete_status` INT(1) NULL,
+  `active_status` INT(1) NULL,
+  `last_updatede_time` DATETIME NULL,
+  PRIMARY KEY (`iddealer_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`dealer_point_member`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`dealer_point_member` (
+  `member_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `member_name` VARCHAR(45) NULL,
+  `user_name` VARCHAR(45) NULL,
+  `password` VARCHAR(200) NULL,
+  `image` LONGTEXT NULL,
+  `nic` VARCHAR(15) NULL,
+  `address` VARCHAR(45) NULL,
+  `contact_no` VARCHAR(10) NULL,
+  `today_hire` INT(10) NULL,
+  `total_hire` INT(10) NULL,
+  `total_amount` DOUBLE NULL,
+  `paid` DOUBLE NULL,
+  `payble_amount` DOUBLE NULL,
+  `delete_status` INT(1) NULL,
+  `active_status` INT(1) NULL,
+  `last_updated_time` DATETIME NULL,
+  `dealer_point_iddealer_id` INT ZEROFILL NOT NULL,
+  PRIMARY KEY (`member_id`, `dealer_point_iddealer_id`),
+  INDEX `fk_dealer_point_member_dealer_point1_idx` (`dealer_point_iddealer_id` ASC) VISIBLE,
+  CONSTRAINT `fk_dealer_point_member_dealer_point1`
+    FOREIGN KEY (`dealer_point_iddealer_id`)
+    REFERENCES `mr_lorry`.`dealer_point` (`iddealer_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`dealer_member_add_payment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`dealer_member_add_payment` (
+  `payment_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `vehicle_no` VARCHAR(10) NULL,
+  `amount` DOUBLE NULL,
+  `date` DATE NULL,
+  `time` TIME NULL,
+  `dealer_point_member_member_id` INT ZEROFILL NOT NULL,
+  `dealer_point_iddealer_id` INT ZEROFILL NOT NULL,
+  `vehicle_vehicle_id` INT ZEROFILL NOT NULL,
+  PRIMARY KEY (`payment_id`, `dealer_point_member_member_id`, `dealer_point_iddealer_id`, `vehicle_vehicle_id`),
+  INDEX `fk_dealer_member_add_payment_dealer_point_member1_idx` (`dealer_point_member_member_id` ASC) VISIBLE,
+  INDEX `fk_dealer_member_add_payment_dealer_point1_idx` (`dealer_point_iddealer_id` ASC) VISIBLE,
+  INDEX `fk_dealer_member_add_payment_vehicle1_idx` (`vehicle_vehicle_id` ASC) VISIBLE,
+  CONSTRAINT `fk_dealer_member_add_payment_dealer_point_member1`
+    FOREIGN KEY (`dealer_point_member_member_id`)
+    REFERENCES `mr_lorry`.`dealer_point_member` (`member_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_dealer_member_add_payment_dealer_point1`
+    FOREIGN KEY (`dealer_point_iddealer_id`)
+    REFERENCES `mr_lorry`.`dealer_point` (`iddealer_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_dealer_member_add_payment_vehicle1`
+    FOREIGN KEY (`vehicle_vehicle_id`)
+    REFERENCES `mr_lorry`.`vehicle` (`vehicle_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`privilages`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`privilages` (
+  `privilages_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `privilages` VARCHAR(45) NULL,
+  `delete_status` INT(1) NULL,
+  `active_status` INT(1) NULL,
+  `last_updated_time` DATETIME NULL,
+  PRIMARY KEY (`privilages_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`users`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`users` (
+  `users_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `user_name` VARCHAR(45) NULL,
+  `password` VARCHAR(45) NULL,
+  `email` VARCHAR(45) NULL,
+  `active_status` INT(1) NULL,
+  `delete_status` INT(1) NULL,
+  `last_active_time` DATETIME NULL,
+  `privilages_privilages_id` INT ZEROFILL NOT NULL,
+  PRIMARY KEY (`users_id`, `privilages_privilages_id`),
+  INDEX `fk_users_privilages1_idx` (`privilages_privilages_id` ASC) VISIBLE,
+  CONSTRAINT `fk_users_privilages1`
+    FOREIGN KEY (`privilages_privilages_id`)
+    REFERENCES `mr_lorry`.`privilages` (`privilages_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`dealer_member_release_payment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`dealer_member_release_payment` (
+  `payment_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `amount` DOUBLE NULL,
+  `date` DATE NULL,
+  `time` TIME NULL,
+  `dealer_point_member_member_id` INT ZEROFILL NOT NULL,
+  `users_users_id` INT ZEROFILL NOT NULL COMMENT 'paymnet eka release karapu kena',
+  `dealer_point_iddealer_id` INT ZEROFILL NOT NULL,
+  PRIMARY KEY (`payment_id`, `dealer_point_member_member_id`, `users_users_id`, `dealer_point_iddealer_id`),
+  INDEX `fk_dealer_member_release_payment_dealer_point_member1_idx` (`dealer_point_member_member_id` ASC) VISIBLE,
+  INDEX `fk_dealer_member_release_payment_users1_idx` (`users_users_id` ASC) VISIBLE,
+  INDEX `fk_dealer_member_release_payment_dealer_point1_idx` (`dealer_point_iddealer_id` ASC) VISIBLE,
+  CONSTRAINT `fk_dealer_member_release_payment_dealer_point_member1`
+    FOREIGN KEY (`dealer_point_member_member_id`)
+    REFERENCES `mr_lorry`.`dealer_point_member` (`member_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_dealer_member_release_payment_users1`
+    FOREIGN KEY (`users_users_id`)
+    REFERENCES `mr_lorry`.`users` (`users_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_dealer_member_release_payment_dealer_point1`
+    FOREIGN KEY (`dealer_point_iddealer_id`)
+    REFERENCES `mr_lorry`.`dealer_point` (`iddealer_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`dealer_add_payment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`dealer_add_payment` (
+  `payment_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `vehicle_no` VARCHAR(10) NULL,
+  `amount` DOUBLE NULL,
+  `date` DATE NULL,
+  `time` TIME NULL,
+  `dealer_point_iddealer_id` INT ZEROFILL NOT NULL,
+  `vehicle_vehicle_id` INT ZEROFILL NOT NULL,
+  PRIMARY KEY (`payment_id`, `dealer_point_iddealer_id`, `vehicle_vehicle_id`),
+  INDEX `fk_dealer_add_payment_dealer_point1_idx` (`dealer_point_iddealer_id` ASC) VISIBLE,
+  INDEX `fk_dealer_add_payment_vehicle1_idx` (`vehicle_vehicle_id` ASC) VISIBLE,
+  CONSTRAINT `fk_dealer_add_payment_dealer_point1`
+    FOREIGN KEY (`dealer_point_iddealer_id`)
+    REFERENCES `mr_lorry`.`dealer_point` (`iddealer_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_dealer_add_payment_vehicle1`
+    FOREIGN KEY (`vehicle_vehicle_id`)
+    REFERENCES `mr_lorry`.`vehicle` (`vehicle_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`dealer_release_payment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`dealer_release_payment` (
+  `payment_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `amount` DOUBLE NULL,
+  `date` DATE NULL,
+  `time` TIME NULL,
+  `dealer_point_iddealer_id` INT ZEROFILL NOT NULL,
+  `users_users_id` INT ZEROFILL NOT NULL COMMENT 'payment eka release karapu kena',
+  PRIMARY KEY (`payment_id`, `dealer_point_iddealer_id`, `users_users_id`),
+  INDEX `fk_dealer_release_payment_dealer_point1_idx` (`dealer_point_iddealer_id` ASC) VISIBLE,
+  INDEX `fk_dealer_release_payment_users1_idx` (`users_users_id` ASC) VISIBLE,
+  CONSTRAINT `fk_dealer_release_payment_dealer_point1`
+    FOREIGN KEY (`dealer_point_iddealer_id`)
+    REFERENCES `mr_lorry`.`dealer_point` (`iddealer_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_dealer_release_payment_users1`
+    FOREIGN KEY (`users_users_id`)
+    REFERENCES `mr_lorry`.`users` (`users_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`socity_add_payment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`socity_add_payment` (
+  `payment_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `vehicle_no` VARCHAR(10) NULL,
+  `amount` DOUBLE NULL,
+  `date` DATE NULL,
+  `time` TIME NULL,
+  `lory_socity_socity_id` INT ZEROFILL NOT NULL,
+  `vehicle_vehicle_id` INT ZEROFILL NOT NULL,
+  `driver_driver_id` INT ZEROFILL NOT NULL,
+  PRIMARY KEY (`payment_id`, `lory_socity_socity_id`, `vehicle_vehicle_id`, `driver_driver_id`),
+  INDEX `fk_socity_add_payment_lory_socity1_idx` (`lory_socity_socity_id` ASC) VISIBLE,
+  INDEX `fk_socity_add_payment_vehicle1_idx` (`vehicle_vehicle_id` ASC) VISIBLE,
+  INDEX `fk_socity_add_payment_driver1_idx` (`driver_driver_id` ASC) VISIBLE,
+  CONSTRAINT `fk_socity_add_payment_lory_socity1`
+    FOREIGN KEY (`lory_socity_socity_id`)
+    REFERENCES `mr_lorry`.`lory_socity` (`socity_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_socity_add_payment_vehicle1`
+    FOREIGN KEY (`vehicle_vehicle_id`)
+    REFERENCES `mr_lorry`.`vehicle` (`vehicle_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_socity_add_payment_driver1`
+    FOREIGN KEY (`driver_driver_id`)
+    REFERENCES `mr_lorry`.`driver` (`driver_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`socity_release_payment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`socity_release_payment` (
+  `payment_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `amount` DOUBLE NULL,
+  `date` DATE NULL,
+  `time` TIME NULL,
+  `lory_socity_socity_id` INT ZEROFILL NOT NULL,
+  `users_users_id` INT ZEROFILL NOT NULL COMMENT 'payment eka release karapu kena',
+  PRIMARY KEY (`payment_id`, `lory_socity_socity_id`, `users_users_id`),
+  INDEX `fk_socity_release_payment_lory_socity1_idx` (`lory_socity_socity_id` ASC) VISIBLE,
+  INDEX `fk_socity_release_payment_users1_idx` (`users_users_id` ASC) VISIBLE,
+  CONSTRAINT `fk_socity_release_payment_lory_socity1`
+    FOREIGN KEY (`lory_socity_socity_id`)
+    REFERENCES `mr_lorry`.`lory_socity` (`socity_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_socity_release_payment_users1`
+    FOREIGN KEY (`users_users_id`)
+    REFERENCES `mr_lorry`.`users` (`users_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`document_types_has_vehicle`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`document_types_has_vehicle` (
+  `document_types_document_types_id` INT ZEROFILL NOT NULL,
+  `vehicle_vehicle_id` INT ZEROFILL NOT NULL,
+  `is_available` INT(1) NULL,
+  PRIMARY KEY (`document_types_document_types_id`, `vehicle_vehicle_id`),
+  INDEX `fk_document_types_has_vehicle_vehicle1_idx` (`vehicle_vehicle_id` ASC) VISIBLE,
+  INDEX `fk_document_types_has_vehicle_document_types_idx` (`document_types_document_types_id` ASC) VISIBLE,
+  CONSTRAINT `fk_document_types_has_vehicle_document_types`
+    FOREIGN KEY (`document_types_document_types_id`)
+    REFERENCES `mr_lorry`.`document_types` (`document_types_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_document_types_has_vehicle_vehicle1`
+    FOREIGN KEY (`vehicle_vehicle_id`)
+    REFERENCES `mr_lorry`.`vehicle` (`vehicle_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`dealer_point_has_driver`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`dealer_point_has_driver` (
+  `dealer_point_iddealer_id` INT ZEROFILL NOT NULL,
+  `driver_driver_id` INT ZEROFILL NOT NULL,
+  `registration_date` DATETIME NULL,
+  PRIMARY KEY (`dealer_point_iddealer_id`, `driver_driver_id`),
+  INDEX `fk_dealer_point_has_driver_driver1_idx` (`driver_driver_id` ASC) VISIBLE,
+  INDEX `fk_dealer_point_has_driver_dealer_point1_idx` (`dealer_point_iddealer_id` ASC) VISIBLE,
+  CONSTRAINT `fk_dealer_point_has_driver_dealer_point1`
+    FOREIGN KEY (`dealer_point_iddealer_id`)
+    REFERENCES `mr_lorry`.`dealer_point` (`iddealer_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_dealer_point_has_driver_driver1`
+    FOREIGN KEY (`driver_driver_id`)
+    REFERENCES `mr_lorry`.`driver` (`driver_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`inquery_status`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`inquery_status` (
+  `idinquery_status` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `status_type` VARCHAR(45) NULL,
+  `delete_status` INT(1) NULL,
+  PRIMARY KEY (`idinquery_status`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mr_lorry`.`inquery`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mr_lorry`.`inquery` (
+  `inquery_id` INT ZEROFILL NOT NULL AUTO_INCREMENT,
+  `header` VARCHAR(45) NULL,
+  `discription` VARCHAR(300) NULL,
+  `rider_id` INT(10) ZEROFILL NULL,
+  `dealer_point_id` INT(10) ZEROFILL NULL,
+  `dealer_point_member_id` INT(10) ZEROFILL NULL,
+  `socity_id` INT(10) ZEROFILL NULL,
+  `driver_id` INT(10) ZEROFILL NULL,
+  `inquery_status_idinquery_status` INT ZEROFILL NOT NULL,
+  PRIMARY KEY (`inquery_id`, `inquery_status_idinquery_status`),
+  INDEX `fk_inquery_inquery_status1_idx` (`inquery_status_idinquery_status` ASC) VISIBLE,
+  CONSTRAINT `fk_inquery_inquery_status1`
+    FOREIGN KEY (`inquery_status_idinquery_status`)
+    REFERENCES `mr_lorry`.`inquery_status` (`idinquery_status`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
